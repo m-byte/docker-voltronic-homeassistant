@@ -1,8 +1,13 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-PROJECT("inverter_poller")
+cmake_minimum_required(VERSION 3.31)
+project("inverter_poller" LANGUAGES CXX)
 
-set (CMAKE_CXX_FLAGS "-O2 --std=c++0x ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 file(GLOB SOURCES *.cpp)
-ADD_EXECUTABLE(inverter_poller ${SOURCES})
-target_link_libraries(inverter_poller -lpthread)
+add_executable(inverter_poller ${SOURCES})
+target_compile_options(inverter_poller PRIVATE -O2)
+
+find_package(Threads REQUIRED)
+target_link_libraries(inverter_poller Threads::Threads)

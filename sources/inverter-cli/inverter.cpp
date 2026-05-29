@@ -124,7 +124,12 @@ bool cInverter::query(const char *cmd) {
     buf[n++] = 0x0d;
 
     //send a command
-    write(fd, &buf, n);
+    ssize_t written = write(fd, buf, n);
+    if (written != n) {
+        lprintf("INVERTER: %s write failed (errno=%d %s)", cmd, errno, strerror(errno));
+        close(fd);
+        return false;
+    }
     time(&started);
 
     // Read until we see the <cr> (0x0d) terminator rather than a fixed number of bytes, so any
@@ -132,7 +137,7 @@ bool cInverter::query(const char *cmd) {
     // shifts them), so the first 0x0d we find is always the genuine end of the reply.
     char *endbuf = NULL;
     do {
-        n = read(fd, (void*)buf+i, sizeof(buf)-i);
+        n = read(fd, buf + i, sizeof(buf)-i);
         if (n < 0) {
             if (time(NULL) - started > 2) {
                 lprintf("INVERTER: %s read timeout", cmd);

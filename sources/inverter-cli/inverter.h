@@ -1,6 +1,8 @@
 #ifndef ___INVERTER_H
 #define ___INVERTER_H
 
+#include <cstdint>
+#include <string>
 #include <thread>
 #include <mutex>
 

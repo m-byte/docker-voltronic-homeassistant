@@ -76,8 +76,29 @@ configure_poll_interval() {
     fi
 }
 
+# Mirror a Home Assistant add-on option into inverter.conf (option key -> conf key).
+# No-op when not running as an add-on (no /data/options.json) or when the option is unset.
+set_inverter_conf() {
+    local options="/data/options.json"
+    local config="/etc/inverter/inverter.conf"
+    local val
+
+    [ -f "$options" ] || return 0
+    val=$(jq -r --arg k "$1" '.[$k] // empty' "$options" 2>/dev/null)
+    [ -z "$val" ] && return 0
+
+    if grep -q "^$2=" "$config" 2>/dev/null; then
+        sed -i "s|^$2=.*|$2=${val}|" "$config"
+    else
+        echo "$2=${val}" >> "$config"
+    fi
+}
+
 configure_mqtt_service
 configure_poll_interval
+set_inverter_conf device device
+set_inverter_conf amperage_factor amperage_factor
+set_inverter_conf watt_factor watt_factor
 
 # Init the mqtt server for the first time, then every 5 minutes
 # This will re-create the auto-created topics in the MQTT server if HA is restarted...

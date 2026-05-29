@@ -16,6 +16,12 @@ services:
 devices:
   - "/dev/hidraw0:/dev/hidraw0:rwm"
 options:
+  device: /dev/hidraw0
   poll_interval: 30
+  amperage_factor: 1.0
+  watt_factor: 1.0
 schema:
+  device: str
   poll_interval: int(5,3600)
+  amperage_factor: float
+  watt_factor: float
